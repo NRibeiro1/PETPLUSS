@@ -6,20 +6,20 @@ from models.pet import Pet
 app = Flask(__name__)
 DB_PATH = "database/petplus.db"
 
-# ----------------- CONEXÃO COM BANCO -----------------
+
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
 
-# ----------------- HOME -----------------
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
 
-# ----------------- DONOS -----------------
+
 @app.route('/donos')
 def listar_donos():
     conn = get_db_connection()
@@ -43,7 +43,7 @@ def cadastro_dono():
     return render_template('cadastro_dono.html')
 
 
-# ---- CRUD DONO ----
+
 @app.route('/dono/<int:id>')
 def crud_dono(id):
     conn = get_db_connection()
@@ -83,7 +83,7 @@ def excluir_dono(id):
     return redirect(url_for('listar_donos'))
 
 
-# ----------------- PETS -----------------
+
 @app.route('/pets')
 def listar_pets():
     conn = get_db_connection()
@@ -119,7 +119,7 @@ def cadastro_pet():
     return render_template('cadastro_pet.html', donos=donos)
 
 
-# ---- CRUD PET ----
+
 @app.route('/pet/<int:id>')
 def crud_pet(id):
     conn = get_db_connection()
@@ -168,6 +168,6 @@ def excluir_pet(id):
     return redirect(url_for('listar_pets'))
 
 
-# ----------------- RUN -----------------
+
 if __name__ == '__main__':
     app.run(debug=True)
