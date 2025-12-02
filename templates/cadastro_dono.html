@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<link rel="stylesheet" href="/static/css/cadastro_dono.css">
+
+<div class="form-container">
+    <h2>Cadastrar Dono</h2>
+
+    <form method="POST" class="styled-form">
+
+        <div class="form-group">
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" name="nome" required>
+        </div>
+
+        <div class="form-group">
+            <label for="telefone">Telefone:</label>
+            <input type="text" id="telefone" name="telefone" maxlength="15">
+        </div>
+
+        <button type="submit" class="btn-submit">Cadastrar</button>
+    </form>
+</div>
+
+<script>
+    const telInput = document.getElementById("telefone");
+
+    telInput.addEventListener("input", function () {
+        let value = this.value.replace(/\D/g, ""); 
+
+        if (value.length > 11) value = value.slice(0, 11);
+
+        if (value.length > 2) {
+            value = "(" + value.slice(0, 2) + ") " + value.slice(2);
+        }
+
+        if (value.length > 9) {
+            value = value.slice(0, 10) + "-" + value.slice(10);
+        }
+
+        this.value = value;
+    });
+</script>
+
+{% endblock %}

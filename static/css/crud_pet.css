@@ -1,0 +1,66 @@
+.card-pet {
+    width: 50%;
+    margin: 25px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    font-family: "Poppins", sans-serif;
+}
+
+.card-pet p {
+    font-size: 18px;
+    margin: 10px 0;
+}
+
+.actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* Botão editar usando base do manage-btn */
+.edit-btn {
+    padding: 10px 25px;
+    background-color: #1589C9;
+    color: white;
+    font-weight: bold;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.edit-btn:hover {
+    background-color: #0f6b99;
+    transform: scale(1.05);
+}
+
+/* Botão excluir */
+.delete-btn {
+    padding: 10px 25px;
+    background-color: #d9534f;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.delete-btn:hover {
+    background-color: #b24340;
+    transform: scale(1.05);
+}
+
+/* Botão voltar */
+.back-btn {
+    display: inline-block;
+    margin-top: 25px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #1589C9;
+}
+
+.back-btn:hover {
+    text-decoration: underline;
+}

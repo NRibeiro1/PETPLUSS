@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Lista de Pets</h2>
+
+<a class="add-pet-btn" href="{{ url_for('cadastro_pet') }}">
+    + Cadastrar novo pet
+</a>
+
+<link rel="stylesheet" href="/static/css/pets.css">
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Espécie</th>
+        <th>Idade</th>
+        <th>Dono</th>
+        <th>Ações</th>
+    </tr>
+
+    {% for pet in pets %}
+    <tr>
+        <td>{{ pet.id }}</td>
+        <td>{{ pet.nome }}</td>
+        <td>{{ pet.especie }}</td>
+        <td>{{ pet.idade }}</td>
+        <td>{{ pet.dono_nome or "Sem dono" }}</td>
+
+        <td>
+            <a class="manage-btn" href="{{ url_for('crud_pet', id=pet.id) }}">
+                Gerenciar
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

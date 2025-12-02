@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Lista de Donos</h2>
+
+<a class="add-pet-btn" href="{{ url_for('cadastro_dono') }}">
+    + Cadastrar novo dono
+</a>
+
+<link rel="stylesheet" href="/static/css/donos.css">
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Telefone</th>
+        <th>Ações</th>
+    </tr>
+
+    {% for dono in donos %}
+    <tr>
+        <td>{{ dono.id }}</td>
+        <td>{{ dono.nome }}</td>
+        <td>{{ dono.telefone }}</td>
+
+        
+        <td>
+            <a class="manage-btn" href="{{ url_for('crud_dono', id=dono.id) }}">
+                Gerenciar
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

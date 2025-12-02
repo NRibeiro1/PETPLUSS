@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Editar Pet</h2>
+
+<form action="{{ url_for('editar_pet', id=pet['id']) }}" method="POST">
+
+    <label>Nome:</label>
+    <input type="text" name="nome" value="{{ pet['nome'] }}" required>
+
+    <label>Espécie:</label>
+    <input type="text" name="especie" value="{{ pet['especie'] }}" required>
+
+    <label>Idade:</label>
+    <input type="number" name="idade" value="{{ pet['idade'] }}" required>
+
+    <label>Dono:</label>
+    <select name="dono_id" required>
+        {% for d in donos %}
+            <option value="{{ d.id }}" 
+                {% if d.id == pet['dono_id'] %}selected{% endif %}>
+                {{ d.nome }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Salvar alterações</button>
+</form>
+
+<a href="{{ url_for('listar_pets') }}">Voltar</a>
+
+{% endblock %}

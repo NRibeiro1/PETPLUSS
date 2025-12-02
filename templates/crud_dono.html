@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<link rel="stylesheet" href="/static/css/crud_dono.css">
+
+<h2>Gerenciar Dono</h2>
+
+<div class="card-dono">
+    <p><strong>ID:</strong> {{ dono.id }}</p>
+    <p><strong>Nome:</strong> {{ dono.nome }}</p>
+    <p><strong>Telefone:</strong> {{ dono.telefone }}</p>
+
+    <div class="actions">
+        <a class="edit-btn" href="{{ url_for('editar_dono', id=dono.id) }}">Editar</a>
+
+        <form method="POST" action="{{ url_for('excluir_dono', id=dono.id) }}" 
+              onsubmit="return confirm('Excluir este dono?');">
+            <button class="delete-btn" type="submit">Excluir</button>
+        </form>
+    </div>
+
+    <a class="back-btn" href="{{ url_for('listar_donos') }}">Voltar</a>
+</div>
+
+{% endblock %}

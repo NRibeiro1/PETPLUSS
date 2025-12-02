@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<link rel="stylesheet" href="/static/css/editar_dono.css">
+
+<div class="form-container">
+    <h2>Editar Dono</h2>
+
+    <form class="styled-form" action="{{ url_for('editar_dono', id=dono.id) }}" method="POST">
+
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome" value="{{ dono.nome }}" required>
+
+        <label for="telefone">Telefone:</label>
+        <input type="text" id="telefone" name="telefone" value="{{ dono.telefone }}" required>
+
+        <button class="save-btn" type="submit">Salvar alterações</button>
+    </form>
+
+    <a class="back-link" href="{{ url_for('listar_donos') }}">Voltar</a>
+</div>
+
+{% endblock %}

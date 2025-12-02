@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<link rel="stylesheet" href="/static/css/crud_pet.css">
+
+<h2>Gerenciar Pet</h2>
+
+<div class="card-pet">
+
+    <p><strong>ID:</strong> {{ pet.id }}</p>
+    <p><strong>Nome:</strong> {{ pet.nome }}</p>
+    <p><strong>Espécie:</strong> {{ pet.especie }}</p>
+    <p><strong>Idade:</strong> {{ pet.idade }}</p>
+    <p><strong>Dono:</strong> {{ pet.dono_nome or "Sem dono" }}</p>
+
+    <div class="actions">
+        <a class="edit-btn" href="{{ url_for('editar_pet', id=pet.id) }}">Editar</a>
+
+        <form method="POST" action="{{ url_for('excluir_pet', id=pet.id) }}"
+              onsubmit="return confirm('Excluir este pet?');">
+            <button class="delete-btn" type="submit">Excluir</button>
+        </form>
+    </div>
+
+    <a class="back-btn" href="{{ url_for('listar_pets') }}">Voltar</a>
+
+</div>
+
+{% endblock %}

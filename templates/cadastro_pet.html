@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<link rel="stylesheet" href="/static/css/cadastro_pet.css">
+
+<div class="form-container">
+    <h2>Cadastrar Pet</h2>
+
+    <form method="POST" class="styled-form">
+
+        <div class="form-group">
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" name="nome" required>
+        </div>
+
+        <div class="form-group">
+            <label for="especie">Espécie:</label>
+            <input type="text" id="especie" name="especie">
+        </div>
+
+        <div class="form-group">
+            <label for="idade">Idade:</label>
+            <input type="number" id="idade" name="idade" min="0">
+        </div>
+
+        <div class="form-group">
+            <label for="dono_id">Dono:</label>
+            <select id="dono_id" name="dono_id">
+                {% for dono in donos %}
+                    <option value="{{ dono.id }}">{{ dono.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="btn-submit">Cadastrar</button>
+    </form>
+</div>
+
+{% endblock %}
