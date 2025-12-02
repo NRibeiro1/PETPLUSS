@@ -1,0 +1,58 @@
+/* ------- FORMULÁRIO PADRONIZADO ------- */
+
+.form-container {
+    width: 60%;
+    margin: 30px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.styled-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.styled-form label {
+    font-weight: bold;
+}
+
+.styled-form input,
+.styled-form select {
+    padding: 10px;
+    border: 1px solid #aaa;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.save-btn {
+    margin-top: 10px;
+    padding: 12px;
+    background-color: #1589C9;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.save-btn:hover {
+    background-color: #0f6b99;
+    transform: scale(1.05);
+}
+
+.back-link {
+    display: block;
+    margin-top: 20px;
+    text-align: center;
+    color: #1589C9;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
