@@ -3,37 +3,73 @@
 
 <link rel="stylesheet" href="/static/css/cadastro_pet.css">
 
-<div class="form-container">
-    <h2>Cadastrar Pet</h2>
+<section class="pet-form-page">
+    <div class="form-layout">
+        <div class="form-intro">
+            <p class="section-kicker">Novo cadastro</p>
+            <h2>Cadastrar Pet</h2>
+            <p class="intro-text">
+                Preencha os dados principais do animal para manter a base organizada e facilitar futuras consultas.
+            </p>
 
-    <form method="POST" class="styled-form">
-
-        <div class="form-group">
-            <label for="nome">Nome:</label>
-            <input type="text" id="nome" name="nome" required>
+            <div class="info-card">
+                <strong>Dica</strong>
+                <p>
+                    Vincule o pet ao usuário do cliente para que ele visualize apenas os próprios dados ao entrar.
+                </p>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="especie">Espécie:</label>
-            <input type="text" id="especie" name="especie">
-        </div>
+        <div class="form-container">
+            {% if users %}
+            <form method="POST" class="styled-form">
+                <div class="form-group">
+                    <label for="nome">Nome</label>
+                    <input type="text" id="nome" name="nome" required>
+                </div>
 
-        <div class="form-group">
-            <label for="idade">Idade:</label>
-            <input type="number" id="idade" name="idade" min="0">
-        </div>
+                <div class="form-group">
+                    <label for="especie">Espécie</label>
+                    <input type="text" id="especie" name="especie">
+                </div>
 
-        <div class="form-group">
-            <label for="dono_id">Dono:</label>
-            <select id="dono_id" name="dono_id">
-                {% for dono in donos %}
-                    <option value="{{ dono.id }}">{{ dono.nome }}</option>
-                {% endfor %}
-            </select>
-        </div>
+                <div class="form-group">
+                    <label for="idade">Idade</label>
+                    <input type="number" id="idade" name="idade" min="0">
+                </div>
 
-        <button type="submit" class="btn-submit">Cadastrar</button>
-    </form>
-</div>
+                <div class="form-group">
+                    <label for="dono_id">Dono</label>
+                    <select id="dono_id" name="dono_id">
+                        {% for dono in donos %}
+                            <option value="{{ dono.id }}">{{ dono.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="user_id">Usuário do cliente</label>
+                    <select id="user_id" name="user_id" required>
+                        {% for user in users %}
+                            <option value="{{ user.id }}">{{ user.username }} - {{ user.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit light-beam-btn">Cadastrar</button>
+                    <a class="btn-back" href="{{ url_for('listar_pets') }}">Voltar para a lista</a>
+                </div>
+            </form>
+            {% else %}
+            <div class="empty-user-state">
+                <strong>Nenhum usuário cliente cadastrado.</strong>
+                <p>Crie uma conta de cliente antes de cadastrar o pet para vincular o acesso corretamente.</p>
+                <a class="btn-back" href="{{ url_for('cadastro_usuario') }}">Criar usuário cliente</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
 
 {% endblock %}

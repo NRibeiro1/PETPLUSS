@@ -27,7 +27,17 @@ CREATE TABLE IF NOT EXISTS pets (
     especie TEXT,
     idade INTEGER,
     dono_id INTEGER,
+    user_id INTEGER,
     FOREIGN KEY (dono_id) REFERENCES donos (id)
+)
+''')
+
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome TEXT NOT NULL,
+    username TEXT NOT NULL UNIQUE,
+    senha TEXT NOT NULL
 )
 ''')
 

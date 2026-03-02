@@ -2,20 +2,50 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>PetPlus</title>
+    <title>{% block title %}PetPlus{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <header>
         <h1>🐾 PetPlus</h1>
         <nav>
-            <a href="{{ url_for('index') }}">Início</a> |
-            <a href="{{ url_for('listar_donos') }}">Donos</a> |
-            <a href="{{ url_for('listar_pets') }}">Pets</a>
+            <a href="{{ url_for('index') }}">Início</a>
+
+            {% if is_admin %}
+                <span class="nav-divider">|</span>
+                <a href="{{ url_for('listar_donos') }}">Donos</a>
+                <span class="nav-divider">|</span>
+                <a href="{{ url_for('listar_pets') }}">Pets</a>
+            {% elif is_user %}
+                <span class="nav-divider">|</span>
+                <a href="{{ url_for('meus_pets') }}">Meus pets</a>
+            {% endif %}
+
+            {% if is_logged_in %}
+                <span class="nav-divider">|</span>
+                <span class="user-chip">{{ current_user_name }}</span>
+                <span class="nav-divider">|</span>
+                <a href="{{ url_for('logout') }}">Sair</a>
+            {% else %}
+                <span class="nav-divider">|</span>
+                <a href="{{ url_for('login') }}">Entrar</a>
+                <span class="nav-divider">|</span>
+                <a href="{{ url_for('cadastro_usuario') }}">Criar conta</a>
+            {% endif %}
         </nav>
     </header>
 
     <main>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-list">
+                    {% for message in messages %}
+                        <div class="flash-message">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
         {% block content %}{% endblock %}
     </main>
 </body>

@@ -27,6 +27,16 @@
             {% endfor %}
         </select>
 
+        <label for="user_id">Usuário do cliente:</label>
+        <select id="user_id" name="user_id" required>
+            {% for user in users %}
+                <option value="{{ user.id }}"
+                    {% if user.id == pet['user_id'] %}selected{% endif %}>
+                    {{ user.username }} - {{ user.nome }}
+                </option>
+            {% endfor %}
+        </select>
+
         <button class="save-btn" type="submit">Salvar alterações</button>
     </form>
 

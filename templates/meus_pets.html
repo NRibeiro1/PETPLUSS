@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Meus Pets - PetPlus{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="/static/css/meus_pets.css">
+
+<section class="my-pets-page">
+    <div class="my-pets-hero">
+        <p class="section-kicker">Área do cliente</p>
+        <h2>Meus pets</h2>
+        <p class="my-pets-text">
+            Aqui você consulta somente os pets vinculados ao seu usuário, com os dados básicos do cadastro.
+        </p>
+    </div>
+
+    {% if pets %}
+        <div class="my-pets-grid">
+            {% for pet in pets %}
+                <article class="my-pet-card">
+                    <h3>{{ pet.nome }}</h3>
+                    <p><strong>Espécie:</strong> {{ pet.especie }}</p>
+                    <p><strong>Idade:</strong> {{ pet.idade }} ano(s)</p>
+                    <p><strong>Dono:</strong> {{ pet.dono_nome or current_user_name }}</p>
+                    <p><strong>Telefone:</strong> {{ pet.dono_telefone or 'Não informado' }}</p>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="my-pets-empty">
+            <strong>Nenhum pet vinculado ao seu usuário no momento.</strong>
+            <p>Peça ao administrador para cadastrar o pet usando o seu nome de usuário.</p>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

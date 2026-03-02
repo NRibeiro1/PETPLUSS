@@ -4,36 +4,142 @@
 
 {% block content %}
 
-<link rel="stylesheet" href="/static/css/style.css">
-
 <div class="home-container">
+    <section class="hero-section">
+        <div class="hero-copy">
+            {% if is_admin %}
+                <p class="hero-badge">Painel administrativo</p>
+                <h2 class="home-title">Centralize donos, pets e informações essenciais em um só lugar.</h2>
+                <p class="home-text hero-text">
+                    O PetPlus foi pensado para facilitar o cadastro, a consulta e a organização
+                    dos dados de cada animal, deixando o controle do sistema mais claro e rápido.
+                </p>
 
-    <h2 class="home-title">Bem-vindo ao PetPlus!</h2>
+                <div class="hero-actions">
+                    <a class="btn-primary" href="{{ url_for('cadastro_pet') }}">Cadastrar pet</a>
+                    <a class="btn-secondary" href="{{ url_for('listar_pets') }}">Ver lista de pets</a>
+                </div>
+            {% else %}
+                <p class="hero-badge">Acesso controlado</p>
+                <h2 class="home-title">Entre como administrador ou crie uma conta de usuário.</h2>
+                <p class="home-text hero-text">
+                    O administrador tem acesso total aos dados de donos e pets. Já o cliente entra com
+                    sua própria conta para consultar apenas as informações do seu pet.
+                </p>
 
-    <p id="text-sub" class="home-text"><strong>O que é o PetPlus?</strong></p>
-    <p class="home-text">PetPlus é um gerenciador simples e intuitivo para acompanhar o bem-estar do seu animal.</p>
-
-    <h2 class="home-subtitle">Donos que usam e confiam no PetPlus</h2>
-
-    <div class="cards-container">
-
-        <div class="card">
-            <img src="/static/img/pets_e_donos/IMG_1086.jpg">
-            
+                <div class="hero-actions">
+                    <a class="btn-primary" href="{{ url_for('login') }}">Entrar</a>
+                    <a class="btn-secondary" href="{{ url_for('cadastro_usuario') }}">Criar conta</a>
+                </div>
+            {% endif %}
         </div>
 
-        <div class="card">
-            <img src="/static/img/pets_e_donos/IMG_9036.jpg">
-            
+        <div class="hero-panel">
+            {% if is_admin %}
+                <h3 class="panel-title">Resumo rápido</h3>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-label">Pets cadastrados</span>
+                        <strong class="stat-value">{{ total_pets }}</strong>
+                    </div>
+
+                    <div class="stat-card">
+                        <span class="stat-label">Donos ativos</span>
+                        <strong class="stat-value">{{ total_donos }}</strong>
+                    </div>
+
+                    <div class="stat-card stat-card-wide">
+                        <span class="stat-label">Média de idade dos pets</span>
+                        <strong class="stat-value">{{ media_idade }} anos</strong>
+                    </div>
+                </div>
+            {% else %}
+                <h3 class="panel-title">Regras de acesso</h3>
+                <div class="access-list">
+                    <div class="access-item">
+                        <strong>Administrador</strong>
+                        <span>Acesso completo ao cadastro e gerenciamento</span>
+                    </div>
+                    <div class="access-item">
+                        <strong>Cliente</strong>
+                        <span>Consulta apenas os dados do pet vinculado ao seu usuário</span>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="home-section">
+        <div class="section-heading">
+            <p class="section-kicker">Por que usar</p>
+            <h3 class="home-subtitle">Uma home mais útil para apresentar o projeto</h3>
         </div>
 
-        <div class="card">
-            <img src="/static/img/pets_e_donos/c74688e9-415f-4e7e-a740-c0460ebb23a5.JPG">
-            
+        <div class="feature-grid">
+            <article class="feature-card">
+                <h4>Cadastro organizado</h4>
+                <p>Registre pet, espécie, idade e dono sem depender de planilhas soltas.</p>
+            </article>
+
+            <article class="feature-card">
+                <h4>Consulta rápida</h4>
+                <p>Acesse listagens e detalhes com poucos cliques para demonstrações e uso diário.</p>
+            </article>
+
+            <article class="feature-card">
+                <h4>Base para evoluir</h4>
+                <p>O sistema já pode crescer para vacinas, consultas, alimentação e histórico clínico.</p>
+            </article>
+        </div>
+    </section>
+
+    {% if is_admin %}
+    <section class="home-section split-section">
+        <div class="split-content">
+            <div class="section-heading">
+                <p class="section-kicker">Confiança</p>
+                <h3 class="home-subtitle">Donos e pets que inspiram o projeto</h3>
+            </div>
+
+            <div class="cards-container">
+                <div class="card">
+                    <img src="/static/img/pets_e_donos/IMG_1086.jpg" alt="Tutor com pet">
+                </div>
+
+                <div class="card">
+                    <img src="/static/img/pets_e_donos/IMG_9036.jpg" alt="Pet em destaque">
+                </div>
+
+                <div class="card">
+                    <img src="/static/img/pets_e_donos/c74688e9-415f-4e7e-a740-c0460ebb23a5.JPG" alt="Dono com animal de estimação">
+                </div>
+            </div>
         </div>
 
-    </div>
+        <aside class="recent-panel">
+            <h3 class="panel-title">Últimos pets cadastrados</h3>
 
+            {% if pets_recentes %}
+                <div class="recent-list">
+                    {% for pet in pets_recentes %}
+                        <div class="recent-item">
+                            <strong>{{ pet.nome }}</strong>
+                            <span>{{ pet.especie }}</span>
+                            <small>Dono: {{ pet.dono_nome or 'Não informado' }}</small>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-state">
+                    Ainda não há pets cadastrados. Use o botão acima para inserir os primeiros registros.
+                </p>
+            {% endif %}
+
+            <a class="btn-secondary full-width" href="{{ url_for('cadastro_dono') }}">Cadastrar dono</a>
+        </aside>
+    </section>
+    {% endif %}
 </div>
 
 {% endblock %}

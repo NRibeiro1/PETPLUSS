@@ -1,39 +1,58 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h2>Lista de Pets</h2>
-
-<a class="add-pet-btn" href="{{ url_for('cadastro_pet') }}">
-    + Cadastrar novo pet
-</a>
-
 <link rel="stylesheet" href="/static/css/pets.css">
 
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Nome</th>
-        <th>Espécie</th>
-        <th>Idade</th>
-        <th>Dono</th>
-        <th>Ações</th>
-    </tr>
+<section class="pets-page">
+    <div class="pets-hero">
+        <div class="pets-hero-copy">
+            <p class="section-kicker">Organização</p>
+            <h2>Lista de Pets</h2>
+            <p class="pets-subtext">
+                Consulte os animais cadastrados, veja os responsáveis e acesse rapidamente a área de gerenciamento.
+            </p>
+        </div>
 
-    {% for pet in pets %}
-    <tr>
-        <td>{{ pet.id }}</td>
-        <td>{{ pet.nome }}</td>
-        <td>{{ pet.especie }}</td>
-        <td>{{ pet.idade }}</td>
-        <td>{{ pet.dono_nome or "Sem dono" }}</td>
+        <a class="add-pet-btn light-beam-btn" href="{{ url_for('cadastro_pet') }}">
+            + Cadastrar novo pet
+        </a>
+    </div>
 
-        <td>
-            <a class="manage-btn" href="{{ url_for('crud_pet', id=pet.id) }}">
-                Gerenciar
-            </a>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+    <div class="table-card">
+        <div class="table-header">
+            <span>{{ pets|length }} pet(s) encontrado(s)</span>
+        </div>
+
+        <div class="table-scroll">
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Espécie</th>
+                    <th>Idade</th>
+                    <th>Dono</th>
+                    <th>Usuário</th>
+                    <th>Ações</th>
+                </tr>
+
+                {% for pet in pets %}
+                <tr>
+                    <td>{{ pet.id }}</td>
+                    <td>{{ pet.nome }}</td>
+                    <td>{{ pet.especie }}</td>
+                    <td>{{ pet.idade }}</td>
+                    <td>{{ pet.dono_nome or "Sem dono" }}</td>
+                    <td>{{ pet.cliente_username or "Não vinculado" }}</td>
+                    <td>
+                        <a class="manage-btn light-beam-btn" href="{{ url_for('crud_pet', id=pet.id) }}">
+                            Gerenciar
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</section>
 
 {% endblock %}

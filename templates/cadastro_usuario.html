@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Criar Conta - PetPlus{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="/static/css/auth.css">
+
+<section class="auth-page">
+    <div class="auth-layout">
+        <div class="auth-copy">
+            <p class="auth-kicker">Usuário comum</p>
+            <h2>Criar conta</h2>
+            <p>
+                Cadastre um nome, um nome de usuário e uma senha para permitir o login de usuários
+                comuns no sistema.
+            </p>
+        </div>
+
+        <div class="auth-card">
+            <form method="POST" class="auth-form">
+                <div class="form-group">
+                    <label for="nome">Nome</label>
+                    <input type="text" id="nome" name="nome" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Nome de usuário</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" name="senha" required>
+                </div>
+
+                <button type="submit" class="auth-btn">Criar conta</button>
+            </form>
+
+            <p class="auth-link-text">
+                Já tem uma conta?
+                <a href="{{ url_for('login') }}">Entrar</a>
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -12,6 +12,7 @@
     <p><strong>Espécie:</strong> {{ pet.especie }}</p>
     <p><strong>Idade:</strong> {{ pet.idade }}</p>
     <p><strong>Dono:</strong> {{ pet.dono_nome or "Sem dono" }}</p>
+    <p><strong>Usuário vinculado:</strong> {{ pet.cliente_username or "Não vinculado" }}</p>
 
     <div class="actions">
         <a class="edit-btn" href="{{ url_for('editar_pet', id=pet.id) }}">Editar</a>
