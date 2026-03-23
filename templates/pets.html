@@ -30,8 +30,12 @@
                     <th>Nome</th>
                     <th>Espécie</th>
                     <th>Idade</th>
+                    <th>Meses</th>
+                    <th>Peso</th>
+                    <th>Porte</th>
                     <th>Dono</th>
                     <th>Usuário</th>
+                    <th>Vacina</th>
                     <th>Ações</th>
                 </tr>
 
@@ -41,8 +45,20 @@
                     <td>{{ pet.nome }}</td>
                     <td>{{ pet.especie }}</td>
                     <td>{{ pet.idade }}</td>
+                    <td>{{ pet.idade_meses or "-" }}</td>
+                    <td>{{ pet.peso ~ " kg" if pet.peso is not none else "-" }}</td>
+                    <td>{{ pet.porte or "-" }}</td>
                     <td>{{ pet.dono_nome or "Sem dono" }}</td>
                     <td>{{ pet.cliente_username or "Não vinculado" }}</td>
+                    <td>
+                        {% if pet.total_vacinas %}
+                            <strong>{{ pet.total_vacinas }} vacina(s)</strong><br>
+                            {{ pet.vacina_observacao or "Primeira vacina cadastrada" }}<br>
+                            {{ pet.vacina_data or "Sem data principal" }}
+                        {% else %}
+                            Nenhuma vacina cadastrada
+                        {% endif %}
+                    </td>
                     <td>
                         <a class="manage-btn light-beam-btn" href="{{ url_for('crud_pet', id=pet.id) }}">
                             Gerenciar

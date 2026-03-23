@@ -17,9 +17,9 @@
 .form-intro,
 .form-container {
     background: rgba(255, 255, 255, 0.94);
-    border: 1px solid rgba(21, 130, 181, 0.16);
+    border: 1px solid var(--brand-soft-strong);
     border-radius: 24px;
-    box-shadow: 0 18px 40px rgba(15, 74, 103, 0.12);
+    box-shadow: var(--shadow);
 }
 
 .form-intro {
@@ -28,7 +28,7 @@
 
 .section-kicker {
     margin: 0 0 6px;
-    color: #0d5f84;
+    color: var(--brand-dark);
     font-size: 14px;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -38,12 +38,12 @@
 .form-intro h2 {
     margin: 0;
     font-size: clamp(2rem, 3vw, 2.8rem);
-    color: #20313c;
+    color: var(--ink);
 }
 
 .intro-text {
     margin: 12px 0 0;
-    color: #5d7280;
+    color: var(--muted);
     line-height: 1.7;
 }
 
@@ -51,19 +51,19 @@
     margin-top: 24px;
     padding: 18px;
     border-radius: 18px;
-    background: linear-gradient(180deg, rgba(21, 130, 181, 0.08), rgba(255, 255, 255, 0.96));
-    border: 1px solid rgba(21, 130, 181, 0.12);
+    background: linear-gradient(180deg, var(--brand-wash), rgba(255, 255, 255, 0.96));
+    border: 1px solid var(--brand-panel);
 }
 
 .info-card strong {
     display: block;
     margin-bottom: 8px;
-    color: #0d5f84;
+    color: var(--brand-dark);
 }
 
 .info-card p {
     margin: 0;
-    color: #5d7280;
+    color: var(--muted);
     line-height: 1.6;
 }
 
@@ -86,27 +86,147 @@
 .form-group label {
     font-size: 14px;
     font-weight: 600;
-    color: #20313c;
+    color: var(--ink);
 }
 
 .form-group input,
-.form-group select {
+.form-group select,
+.form-group textarea {
     padding: 14px 16px;
-    border: 1px solid rgba(21, 130, 181, 0.18);
+    border: 1px solid var(--line-soft);
     border-radius: 14px;
     font-size: 15px;
     font-family: 'Poppins', sans-serif;
-    color: #20313c;
-    background: rgba(247, 251, 254, 0.9);
+    color: var(--ink);
+    background: rgba(255, 255, 255, 0.82);
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
 .form-group input:focus,
-.form-group select:focus {
-    border-color: #1582b5;
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: var(--brand);
     outline: none;
     background: #ffffff;
-    box-shadow: 0 0 0 4px rgba(21, 130, 181, 0.12);
+    box-shadow: 0 0 0 4px var(--brand-ring);
+}
+
+.form-group textarea {
+    min-height: 58px;
+    resize: vertical;
+}
+
+.calendar-card {
+    padding: 20px;
+    border-radius: 20px;
+    border: 1px solid var(--brand-panel);
+    background: linear-gradient(180deg, var(--brand-panel-fade), rgba(255, 255, 255, 0.98));
+}
+
+.calendar-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.calendar-card-header h3 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.1rem;
+}
+
+.calendar-card-header p {
+    margin: 8px 0 0;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+.vaccine-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 18px;
+}
+
+.vaccine-item {
+    position: relative;
+    padding: 18px;
+    border-radius: 18px;
+    border: 1px solid var(--brand-panel);
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.checkbox-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 16px;
+    border: 1px solid var(--brand-soft-strong);
+    background: rgba(var(--brand-rgb), 0.06);
+    cursor: pointer;
+}
+
+.checkbox-card input {
+    margin-top: 2px;
+    accent-color: var(--brand);
+}
+
+.checkbox-card span {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.checkbox-card strong {
+    color: var(--ink);
+    font-size: 0.98rem;
+}
+
+.checkbox-card small {
+    color: var(--muted);
+    line-height: 1.5;
+}
+
+.add-vaccine-btn,
+.remove-vaccine-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border: 0;
+    border-radius: 14px;
+    cursor: pointer;
+    font-size: 1.5rem;
+    line-height: 1;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.add-vaccine-btn {
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-mid) 100%);
+    color: #ffffff;
+    box-shadow: 0 14px 24px rgba(var(--brand-rgb), 0.22);
+}
+
+.remove-vaccine-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(217, 76, 90, 0.12);
+    color: #c43e50;
+}
+
+.add-vaccine-btn:hover,
+.remove-vaccine-btn:hover {
+    transform: translateY(-2px);
 }
 
 .form-actions {
@@ -120,12 +240,12 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    color: #5d7280;
+    color: var(--muted);
     line-height: 1.6;
 }
 
 .empty-user-state strong {
-    color: #20313c;
+    color: var(--ink);
 }
 
 .btn-submit,
@@ -146,15 +266,15 @@
 .btn-submit {
     border: 0;
     cursor: pointer;
-    background: linear-gradient(135deg, #1582b5 0%, #33a6d5 100%);
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-mid) 100%);
     color: #ffffff;
-    box-shadow: 0 14px 28px rgba(21, 130, 181, 0.24);
+    box-shadow: 0 14px 28px rgba(var(--brand-rgb), 0.24);
 }
 
 .btn-back {
-    background: rgba(21, 130, 181, 0.08);
-    color: #0d5f84;
-    border: 1px solid rgba(21, 130, 181, 0.12);
+    background: var(--brand-wash);
+    color: var(--brand-dark);
+    border: 1px solid var(--brand-panel);
 }
 
 .light-beam-btn::before {
@@ -185,11 +305,11 @@
 }
 
 .btn-submit:hover {
-    box-shadow: 0 18px 36px rgba(21, 130, 181, 0.28);
+    box-shadow: 0 18px 36px rgba(var(--brand-rgb), 0.28);
 }
 
 .btn-back:hover {
-    box-shadow: 0 10px 20px rgba(15, 74, 103, 0.1);
+    box-shadow: 0 10px 20px rgba(var(--shadow-rgb), 0.1);
 }
 
 @media (max-width: 860px) {

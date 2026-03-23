@@ -1,64 +1,63 @@
 .card-dono {
-    width: 50%;
+    width: min(100%, 620px);
     margin: 25px auto;
-    background: white;
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 28px;
+    border-radius: 20px;
+    border: 1px solid var(--brand-soft-strong);
+    box-shadow: var(--shadow);
     font-family: "Poppins", sans-serif;
 }
 
 .card-dono p {
     font-size: 18px;
     margin: 10px 0;
+    color: var(--ink);
 }
 
 .actions {
     display: flex;
     gap: 15px;
     margin-top: 20px;
+    flex-wrap: wrap;
 }
 
+.edit-btn,
+.delete-btn {
+    padding: 11px 24px;
+    color: white;
+    font-weight: 700;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
 
 .edit-btn {
-    padding: 10px 25px;
-    background-color: #1589C9;
-    color: white;
-    font-weight: bold;
-    border-radius: 6px;
-    text-decoration: none;
-    transition: 0.3s;
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-mid) 100%);
+    box-shadow: 0 14px 28px rgba(var(--brand-rgb), 0.22);
 }
 
-.edit-btn:hover {
-    background-color: #0f6b99;
-    transform: scale(1.05);
+.edit-btn:hover,
+.delete-btn:hover {
+    transform: translateY(-2px);
 }
 
-/* Botão excluir */
 .delete-btn {
-    padding: 10px 25px;
     background-color: #d9534f;
-    color: white;
-    font-weight: bold;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.3s;
 }
 
 .delete-btn:hover {
-    background-color: #b24340;
-    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(185, 67, 64, 0.22);
 }
-
 
 .back-btn {
     display: inline-block;
     margin-top: 25px;
-    font-weight: bold;
+    font-weight: 700;
     text-decoration: none;
-    color: #1589C9;
+    color: var(--brand-dark);
 }
 
 .back-btn:hover {

@@ -5,9 +5,49 @@
     <title>{% block title %}PetPlus{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body>
+<body class="{% if is_admin %}admin-theme{% endif %}" {% if is_admin %}data-theme="blue"{% endif %}>
     <header>
-        <h1>🐾 PetPlus</h1>
+        <div class="header-top">
+            <div class="brand-stack">
+                <h1>PetPlus</h1>
+            </div>
+
+            {% if is_admin %}
+                <div class="admin-theme-toolbar" aria-label="Seletor de cor do painel administrativo">
+                    <p class="admin-theme-label">Personalize o tema do painel</p>
+                    <div class="admin-theme-swatches">
+                        <button type="button" class="theme-swatch is-active" data-theme-swatch="blue" data-theme-label="Azul" aria-label="Tema azul" title="Azul">
+                            <span class="theme-swatch-dot theme-blue"></span>
+                        </button>
+                        <button type="button" class="theme-swatch" data-theme-swatch="purple" data-theme-label="Roxo" aria-label="Tema roxo" title="Roxo">
+                            <span class="theme-swatch-dot theme-purple"></span>
+                        </button>
+                        <button type="button" class="theme-swatch" data-theme-swatch="yellow" data-theme-label="Amarelo" aria-label="Tema amarelo" title="Amarelo">
+                            <span class="theme-swatch-dot theme-yellow"></span>
+                        </button>
+                        <button type="button" class="theme-swatch" data-theme-swatch="green" data-theme-label="Verde" aria-label="Tema verde" title="Verde">
+                            <span class="theme-swatch-dot theme-green"></span>
+                        </button>
+                        <button type="button" class="theme-swatch" data-theme-swatch="pink" data-theme-label="Rosa" aria-label="Tema rosa" title="Rosa">
+                            <span class="theme-swatch-dot theme-pink"></span>
+                        </button>
+                        <button type="button" class="theme-swatch" data-theme-swatch="brown" data-theme-label="Marrom" aria-label="Tema marrom" title="Marrom">
+                            <span class="theme-swatch-dot theme-brown"></span>
+                        </button>
+                        <button type="button" class="theme-swatch" data-theme-swatch="black" data-theme-label="Preto" aria-label="Tema preto" title="Preto">
+                            <span class="theme-swatch-dot theme-black"></span>
+                        </button>
+                        <button type="button" class="theme-swatch" data-theme-swatch="red" data-theme-label="Vermelho" aria-label="Tema vermelho" title="Vermelho">
+                            <span class="theme-swatch-dot theme-red"></span>
+                        </button>
+                        <button type="button" class="theme-swatch" data-theme-swatch="orange" data-theme-label="Laranja" aria-label="Tema laranja" title="Laranja">
+                            <span class="theme-swatch-dot theme-orange"></span>
+                        </button>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
         <nav>
             <a href="{{ url_for('index') }}">Início</a>
 
@@ -48,5 +88,36 @@
 
         {% block content %}{% endblock %}
     </main>
+
+    {% if is_admin %}
+    <script>
+        const adminThemeKey = "petplus-admin-theme";
+        const adminThemeOptions = ["blue", "purple", "yellow", "green", "pink", "brown", "black", "red", "orange"];
+        const adminThemeBody = document.body;
+        const adminThemeButtons = document.querySelectorAll("[data-theme-swatch]");
+
+        function applyAdminTheme(themeName) {
+            const nextTheme = adminThemeOptions.includes(themeName) ? themeName : "blue";
+            adminThemeBody.dataset.theme = nextTheme;
+
+            adminThemeButtons.forEach((button) => {
+                const isActive = button.dataset.themeSwatch === nextTheme;
+                button.classList.toggle("is-active", isActive);
+                button.setAttribute("aria-pressed", isActive ? "true" : "false");
+            });
+        }
+
+        const savedAdminTheme = localStorage.getItem(adminThemeKey);
+        applyAdminTheme(savedAdminTheme || "blue");
+
+        adminThemeButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                const selectedTheme = button.dataset.themeSwatch;
+                applyAdminTheme(selectedTheme);
+                localStorage.setItem(adminThemeKey, selectedTheme);
+            });
+        });
+    </script>
+    {% endif %}
 </body>
 </html>

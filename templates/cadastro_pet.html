@@ -34,8 +34,28 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="idade">Idade</label>
+                    <label for="idade">Idade (anos)</label>
                     <input type="number" id="idade" name="idade" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="idade_meses">Idade em meses</label>
+                    <input type="number" id="idade_meses" name="idade_meses" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="peso">Peso (kg)</label>
+                    <input type="number" id="peso" name="peso" min="0" step="0.1">
+                </div>
+
+                <div class="form-group">
+                    <label for="porte">Porte</label>
+                    <select id="porte" name="porte">
+                        <option value="">Selecione</option>
+                        <option value="Pequeno">Pequeno</option>
+                        <option value="Médio">Médio</option>
+                        <option value="Grande">Grande</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
@@ -56,6 +76,41 @@
                     </select>
                 </div>
 
+                <div class="calendar-card">
+                    <div class="calendar-card-header calendar-card-top">
+                        <div>
+                            <h3>Vacinas</h3>
+                            <p>Adicione uma ou mais vacinas com data e recorrência anual, quando necessário.</p>
+                        </div>
+                        <button type="button" class="add-vaccine-btn" data-add-vaccine aria-label="Adicionar outra vacina">+</button>
+                    </div>
+
+                    <div class="vaccine-list" id="vaccine-list">
+                        <div class="vaccine-item">
+                            <div class="calendar-grid">
+                                <div class="form-group">
+                                    <label>Vacina</label>
+                                    <textarea name="vacina_nome[]" rows="2" placeholder="Ex.: V10"></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Data da vacina</label>
+                                    <input type="date" name="vacina_data[]">
+                                </div>
+
+                                <label class="checkbox-card">
+                                    <input type="hidden" name="vacina_recorrente_anual[]" value="0">
+                                    <input type="checkbox" data-recurring-toggle>
+                                    <span>
+                                        <strong>Recorre a cada 1 ano</strong>
+                                        <small>Destaca a próxima dose automaticamente para o cliente.</small>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-actions">
                     <button type="submit" class="btn-submit light-beam-btn">Cadastrar</button>
                     <a class="btn-back" href="{{ url_for('listar_pets') }}">Voltar para a lista</a>
@@ -71,5 +126,64 @@
         </div>
     </div>
 </section>
+
+<template id="vaccine-item-template">
+    <div class="vaccine-item">
+        <button type="button" class="remove-vaccine-btn" data-remove-vaccine aria-label="Remover vacina">×</button>
+        <div class="calendar-grid">
+            <div class="form-group">
+                <label>Vacina</label>
+                <textarea name="vacina_nome[]" rows="2" placeholder="Ex.: Antirrábica"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Data da vacina</label>
+                <input type="date" name="vacina_data[]">
+            </div>
+
+            <label class="checkbox-card">
+                <input type="hidden" name="vacina_recorrente_anual[]" value="0">
+                <input type="checkbox" data-recurring-toggle>
+                <span>
+                    <strong>Recorre a cada 1 ano</strong>
+                    <small>Destaca a próxima dose automaticamente para o cliente.</small>
+                </span>
+            </label>
+        </div>
+    </div>
+</template>
+
+<script>
+    const vaccineList = document.getElementById("vaccine-list");
+    const vaccineTemplate = document.getElementById("vaccine-item-template");
+    const addVaccineButton = document.querySelector("[data-add-vaccine]");
+
+    function wireVaccineItem(vaccineItem) {
+        const toggle = vaccineItem.querySelector("[data-recurring-toggle]");
+        const hiddenInput = vaccineItem.querySelector('input[type="hidden"][name="vacina_recorrente_anual[]"]');
+        const removeButton = vaccineItem.querySelector("[data-remove-vaccine]");
+
+        if (toggle && hiddenInput) {
+            toggle.addEventListener("change", () => {
+                hiddenInput.value = toggle.checked ? "1" : "0";
+            });
+        }
+
+        if (removeButton) {
+            removeButton.addEventListener("click", () => {
+                vaccineItem.remove();
+            });
+        }
+    }
+
+    addVaccineButton.addEventListener("click", () => {
+        const fragment = vaccineTemplate.content.cloneNode(true);
+        const vaccineItem = fragment.querySelector(".vaccine-item");
+        wireVaccineItem(vaccineItem);
+        vaccineList.appendChild(fragment);
+    });
+
+    document.querySelectorAll(".vaccine-item").forEach(wireVaccineItem);
+</script>
 
 {% endblock %}

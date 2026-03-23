@@ -11,8 +11,26 @@
     <p><strong>Nome:</strong> {{ pet.nome }}</p>
     <p><strong>Espécie:</strong> {{ pet.especie }}</p>
     <p><strong>Idade:</strong> {{ pet.idade }}</p>
+    <p><strong>Idade em meses:</strong> {{ pet.idade_meses or "Não informada" }}</p>
+    <p><strong>Peso:</strong> {{ (pet.peso ~ " kg") if pet.peso is not none else "Não informado" }}</p>
+    <p><strong>Porte:</strong> {{ pet.porte or "Não informado" }}</p>
     <p><strong>Dono:</strong> {{ pet.dono_nome or "Sem dono" }}</p>
     <p><strong>Usuário vinculado:</strong> {{ pet.cliente_username or "Não vinculado" }}</p>
+    <div class="vaccines-summary">
+        <strong>Vacinas cadastradas:</strong>
+        {% if vaccines %}
+            <ul>
+                {% for vaccine in vaccines %}
+                    <li>
+                        {{ vaccine.vacina_nome or "Vacina sem nome" }} - {{ vaccine.vacina_data or "Sem data" }}
+                        ({{ "Recorre a cada 1 ano" if vaccine.recorrente_anual else "Dose avulsa" }})
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Nenhuma vacina cadastrada.</p>
+        {% endif %}
+    </div>
 
     <div class="actions">
         <a class="edit-btn" href="{{ url_for('editar_pet', id=pet.id) }}">Editar</a>

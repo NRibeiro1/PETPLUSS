@@ -10,19 +10,90 @@
         <p class="section-kicker">Área do cliente</p>
         <h2>Meus pets</h2>
         <p class="my-pets-text">
-            Aqui você consulta somente os pets vinculados ao seu usuário, com os dados básicos do cadastro.
+            Aqui você consulta seus pets e acompanha visualmente as vacinas já registradas e as próximas doses.
         </p>
     </div>
 
     {% if pets %}
+        <section class="vaccine-calendar-shell">
+            <div class="calendar-panel">
+                <div class="calendar-panel-head">
+                    <div>
+                        <p class="calendar-eyebrow">Agenda de vacinação</p>
+                        <h3>Calendário de vacinas</h3>
+                    </div>
+
+                    <div class="calendar-legend">
+                        <span class="legend-pill legend-taken">Tomadas</span>
+                        <span class="legend-pill legend-upcoming">Ainda longe</span>
+                        <span class="legend-pill legend-due">A tomar</span>
+                    </div>
+                </div>
+
+                {% if vaccine_events %}
+                    <div class="calendar-toolbar">
+                        <button type="button" class="calendar-nav" data-calendar-nav="prev" aria-label="Mês anterior">‹</button>
+                        <div>
+                            <strong id="calendar-month-label"></strong>
+                            <p class="calendar-toolbar-text">Veja as datas em destaque por pet.</p>
+                        </div>
+                        <button type="button" class="calendar-nav" data-calendar-nav="next" aria-label="Próximo mês">›</button>
+                    </div>
+
+                    <div class="calendar-weekdays">
+                        <span>Dom</span>
+                        <span>Seg</span>
+                        <span>Ter</span>
+                        <span>Qua</span>
+                        <span>Qui</span>
+                        <span>Sex</span>
+                        <span>Sáb</span>
+                    </div>
+
+                    <div class="calendar-grid" id="vaccine-calendar-grid"></div>
+                {% else %}
+                    <div class="calendar-empty-state">
+                        <strong>Nenhuma vacina cadastrada ainda.</strong>
+                        <p>Assim que o administrador registrar uma dose, ela aparecerá aqui no calendário.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <aside class="agenda-panel">
+                <div class="agenda-panel-head">
+                    <p class="calendar-eyebrow">Resumo rápido</p>
+                    <h3>Próximas e últimas vacinas</h3>
+                </div>
+
+                {% if vaccine_events %}
+                    <div class="agenda-list" id="vaccine-agenda-list"></div>
+                {% else %}
+                    <div class="calendar-empty-state compact">
+                        <p>Nenhuma data de vacinação disponível para exibir.</p>
+                    </div>
+                {% endif %}
+            </aside>
+        </section>
+
         <div class="my-pets-grid">
             {% for pet in pets %}
                 <article class="my-pet-card">
                     <h3>{{ pet.nome }}</h3>
                     <p><strong>Espécie:</strong> {{ pet.especie }}</p>
                     <p><strong>Idade:</strong> {{ pet.idade }} ano(s)</p>
+                    <p><strong>Idade em meses:</strong> {{ pet.idade_meses or 'Não informada' }}</p>
+                    <p><strong>Peso:</strong> {{ (pet.peso ~ ' kg') if pet.peso is not none else 'Não informado' }}</p>
+                    <p><strong>Porte:</strong> {{ pet.porte or 'Não informado' }}</p>
                     <p><strong>Dono:</strong> {{ pet.dono_nome or current_user_name }}</p>
                     <p><strong>Telefone:</strong> {{ pet.dono_telefone or 'Não informado' }}</p>
+                    <p><strong>Total de vacinas:</strong> {{ pet_vaccines_map.get(pet.id, [])|length }}</p>
+                    <p><strong>Última vacina:</strong>
+                        {% if pet_vaccines_map.get(pet.id) %}
+                            {{ pet_vaccines_map.get(pet.id)[-1].vacina_nome or 'Vacina registrada' }}
+                        {% else %}
+                            Não registrada
+                        {% endif %}
+                    </p>
                 </article>
             {% endfor %}
         </div>
@@ -33,4 +104,106 @@
         </div>
     {% endif %}
 </section>
+
+{% if vaccine_events %}
+<script>
+    const vaccineEvents = {{ vaccine_events|tojson }};
+    const todayIso = "{{ today }}";
+    const calendarGrid = document.getElementById("vaccine-calendar-grid");
+    const calendarMonthLabel = document.getElementById("calendar-month-label");
+    const agendaList = document.getElementById("vaccine-agenda-list");
+    const navButtons = document.querySelectorAll("[data-calendar-nav]");
+    const today = new Date(`${todayIso}T12:00:00`);
+    let visibleMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    const formatMonth = (date) => new Intl.DateTimeFormat("pt-BR", {
+        month: "long",
+        year: "numeric",
+    }).format(date);
+
+    const formatDate = (isoDate) => new Intl.DateTimeFormat("pt-BR", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+    }).format(new Date(`${isoDate}T12:00:00`));
+
+    const escapeHtml = (value) => String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+
+    const eventLabelMap = {
+        taken: "Tomada",
+        upcoming: "Ainda longe",
+        due: "A tomar",
+        overdue: "A tomar",
+    };
+
+    function renderAgenda() {
+        const sortedEvents = [...vaccineEvents].sort((a, b) => a.date.localeCompare(b.date));
+        agendaList.innerHTML = sortedEvents.map((event) => `
+            <article class="agenda-item agenda-${event.status}">
+                <div class="agenda-date">${formatDate(event.date)}</div>
+                <div class="agenda-copy">
+                    <span class="agenda-badge">${eventLabelMap[event.status]}</span>
+                    <strong>${escapeHtml(event.pet_name)}</strong>
+                    <p>${escapeHtml(event.title)}: ${escapeHtml(event.note)}</p>
+                </div>
+            </article>
+        `).join("");
+    }
+
+    function renderCalendar() {
+        const year = visibleMonth.getFullYear();
+        const month = visibleMonth.getMonth();
+        const firstDay = new Date(year, month, 1);
+        const startDay = firstDay.getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const monthKey = `${year}-${String(month + 1).padStart(2, "0")}`;
+
+        calendarMonthLabel.textContent = formatMonth(firstDay);
+        calendarGrid.innerHTML = "";
+
+        for (let index = 0; index < startDay; index += 1) {
+            const blankCell = document.createElement("div");
+            blankCell.className = "calendar-day is-empty";
+            calendarGrid.appendChild(blankCell);
+        }
+
+        for (let day = 1; day <= daysInMonth; day += 1) {
+            const dateKey = `${monthKey}-${String(day).padStart(2, "0")}`;
+            const cell = document.createElement("article");
+            const dayEvents = vaccineEvents.filter((event) => event.date === dateKey);
+            const isToday = dateKey === todayIso;
+
+            cell.className = `calendar-day${isToday ? " is-today" : ""}`;
+            cell.innerHTML = `
+                <div class="calendar-day-number">${day}</div>
+                <div class="calendar-day-events">
+                    ${dayEvents.map((event) => `
+                        <div class="calendar-event ${event.status}">
+                            <span>${escapeHtml(event.pet_name)}</span>
+                        </div>
+                    `).join("")}
+                </div>
+            `;
+
+            calendarGrid.appendChild(cell);
+        }
+    }
+
+    navButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const direction = button.dataset.calendarNav === "next" ? 1 : -1;
+            visibleMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() + direction, 1);
+            renderCalendar();
+        });
+    });
+
+    renderAgenda();
+    renderCalendar();
+</script>
+{% endif %}
 {% endblock %}

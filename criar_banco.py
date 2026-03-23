@@ -26,8 +26,14 @@ CREATE TABLE IF NOT EXISTS pets (
     nome TEXT NOT NULL,
     especie TEXT,
     idade INTEGER,
+    idade_meses INTEGER,
+    peso REAL,
+    porte TEXT,
     dono_id INTEGER,
     user_id INTEGER,
+    vacina_data TEXT,
+    vacina_observacao TEXT,
+    vacina_recorrente_anual INTEGER DEFAULT 0,
     FOREIGN KEY (dono_id) REFERENCES donos (id)
 )
 ''')
@@ -38,6 +44,17 @@ CREATE TABLE IF NOT EXISTS users (
     nome TEXT NOT NULL,
     username TEXT NOT NULL UNIQUE,
     senha TEXT NOT NULL
+)
+''')
+
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS pet_vaccines (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    pet_id INTEGER NOT NULL,
+    vacina_nome TEXT,
+    vacina_data TEXT,
+    recorrente_anual INTEGER DEFAULT 0,
+    FOREIGN KEY (pet_id) REFERENCES pets (id) ON DELETE CASCADE
 )
 ''')
 

@@ -1,5 +1,6 @@
 from functools import wraps
 import sqlite3
+from datetime import date, datetime
 
 from flask import Flask, flash, render_template, request, redirect, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -21,6 +22,24 @@ def get_db_connection():
 def init_db():
     conn = get_db_connection()
     conn.execute("""
+        CREATE TABLE IF NOT EXISTS pets (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            especie TEXT,
+            idade INTEGER,
+            idade_meses INTEGER,
+            peso REAL,
+            porte TEXT,
+            dono_id INTEGER,
+            user_id INTEGER,
+            vacina_data TEXT,
+            vacina_observacao TEXT,
+            vacina_recorrente_anual INTEGER DEFAULT 0,
+            FOREIGN KEY (dono_id) REFERENCES donos(id),
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    """)
+    conn.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nome TEXT NOT NULL,
@@ -28,11 +47,162 @@ def init_db():
             senha TEXT NOT NULL
         )
     """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS pet_vaccines (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            pet_id INTEGER NOT NULL,
+            vacina_nome TEXT,
+            vacina_data TEXT,
+            recorrente_anual INTEGER DEFAULT 0,
+            FOREIGN KEY (pet_id) REFERENCES pets(id) ON DELETE CASCADE
+        )
+    """)
     pet_columns = [column["name"] for column in conn.execute("PRAGMA table_info(pets)").fetchall()]
     if "user_id" not in pet_columns:
         conn.execute("ALTER TABLE pets ADD COLUMN user_id INTEGER REFERENCES users(id)")
+    if "vacina_data" not in pet_columns:
+        conn.execute("ALTER TABLE pets ADD COLUMN vacina_data TEXT")
+    if "vacina_observacao" not in pet_columns:
+        conn.execute("ALTER TABLE pets ADD COLUMN vacina_observacao TEXT")
+    if "vacina_recorrente_anual" not in pet_columns:
+        conn.execute("ALTER TABLE pets ADD COLUMN vacina_recorrente_anual INTEGER DEFAULT 0")
+    if "idade_meses" not in pet_columns:
+        conn.execute("ALTER TABLE pets ADD COLUMN idade_meses INTEGER")
+    if "peso" not in pet_columns:
+        conn.execute("ALTER TABLE pets ADD COLUMN peso REAL")
+    if "porte" not in pet_columns:
+        conn.execute("ALTER TABLE pets ADD COLUMN porte TEXT")
+    existing_single_vaccines = conn.execute("""
+        SELECT id, vacina_data, vacina_observacao, vacina_recorrente_anual
+        FROM pets
+        WHERE vacina_data IS NOT NULL
+          AND TRIM(vacina_data) <> ''
+          AND NOT EXISTS (
+              SELECT 1
+              FROM pet_vaccines
+              WHERE pet_vaccines.pet_id = pets.id
+          )
+    """).fetchall()
+    for vaccine in existing_single_vaccines:
+        conn.execute("""
+            INSERT INTO pet_vaccines (pet_id, vacina_nome, vacina_data, recorrente_anual)
+            VALUES (?, ?, ?, ?)
+        """, (
+            vaccine["id"],
+            vaccine["vacina_observacao"],
+            vaccine["vacina_data"],
+            vaccine["vacina_recorrente_anual"] or 0,
+        ))
     conn.commit()
     conn.close()
+
+
+def parse_iso_date(value):
+    if not value:
+        return None
+    try:
+        return datetime.strptime(value, "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+
+def safe_replace_year(source_date, year):
+    try:
+        return source_date.replace(year=year)
+    except ValueError:
+        return source_date.replace(year=year, day=28)
+
+
+def build_vaccine_events(vaccines):
+    today = date.today()
+    events = []
+
+    for vaccine in vaccines:
+        vacina_date = parse_iso_date(vaccine["vacina_data"])
+        if not vacina_date:
+            continue
+
+        nome_vacina = (vaccine["vacina_nome"] or "Vacina registrada").strip()
+        events.append({
+            "pet_name": vaccine["pet_nome"],
+            "date": vacina_date.isoformat(),
+            "title": "Vacina tomada",
+            "note": nome_vacina,
+            "status": "taken",
+        })
+
+        if vaccine["recorrente_anual"]:
+            due_year = max(today.year, vacina_date.year + 1)
+            due_date = safe_replace_year(vacina_date, due_year)
+            if due_date <= vacina_date:
+                due_date = safe_replace_year(vacina_date, vacina_date.year + 1)
+
+            days_until_due = (due_date - today).days
+            status = "overdue"
+            if days_until_due >= 60:
+                status = "upcoming"
+            elif days_until_due >= 0:
+                status = "due"
+
+            events.append({
+                "pet_name": vaccine["pet_nome"],
+                "date": due_date.isoformat(),
+                "title": "Próxima dose",
+                "note": nome_vacina,
+                "status": status,
+            })
+
+    events.sort(key=lambda item: item["date"])
+    return events
+
+
+def collect_vaccines_from_form(form):
+    vaccine_names = form.getlist("vacina_nome[]")
+    vaccine_dates = form.getlist("vacina_data[]")
+    vaccine_recurring = form.getlist("vacina_recorrente_anual[]")
+    vaccines = []
+
+    max_len = max(len(vaccine_names), len(vaccine_dates), len(vaccine_recurring), 0)
+    for index in range(max_len):
+        vacina_nome = vaccine_names[index].strip() if index < len(vaccine_names) else ""
+        vacina_data = vaccine_dates[index].strip() if index < len(vaccine_dates) else ""
+        recorrente = vaccine_recurring[index].strip() if index < len(vaccine_recurring) else "0"
+
+        if not vacina_nome and not vacina_data:
+            continue
+
+        vaccines.append({
+            "vacina_nome": vacina_nome or None,
+            "vacina_data": vacina_data or None,
+            "recorrente_anual": 1 if recorrente == "1" else 0,
+        })
+
+    return vaccines
+
+
+def save_pet_vaccines(conn, pet_id, vaccines):
+    conn.execute("DELETE FROM pet_vaccines WHERE pet_id = ?", (pet_id,))
+    for vaccine in vaccines:
+        conn.execute("""
+            INSERT INTO pet_vaccines (pet_id, vacina_nome, vacina_data, recorrente_anual)
+            VALUES (?, ?, ?, ?)
+        """, (
+            pet_id,
+            vaccine["vacina_nome"],
+            vaccine["vacina_data"],
+            vaccine["recorrente_anual"],
+        ))
+
+
+def build_primary_vaccine_fields(vaccines):
+    if not vaccines:
+        return None, None, 0
+    primary_vaccine = vaccines[0]
+    return (
+        primary_vaccine["vacina_data"],
+        primary_vaccine["vacina_nome"],
+        primary_vaccine["recorrente_anual"],
+    )
 
 
 def login_required(view):
@@ -203,14 +373,32 @@ def logout():
 def meus_pets():
     conn = get_db_connection()
     pets = conn.execute("""
-        SELECT pets.nome, pets.especie, pets.idade, donos.nome AS dono_nome, donos.telefone AS dono_telefone
+        SELECT pets.id, pets.nome, pets.especie, pets.idade, pets.idade_meses, pets.peso, pets.porte,
+               donos.nome AS dono_nome, donos.telefone AS dono_telefone
         FROM pets
         LEFT JOIN donos ON pets.dono_id = donos.id
         WHERE pets.user_id = ?
         ORDER BY pets.nome
     """, (session.get("user_id"),)).fetchall()
+    vaccines = conn.execute("""
+        SELECT pet_vaccines.*, pets.nome AS pet_nome
+        FROM pet_vaccines
+        INNER JOIN pets ON pets.id = pet_vaccines.pet_id
+        WHERE pets.user_id = ?
+        ORDER BY pet_vaccines.vacina_data, pet_vaccines.id
+    """, (session.get("user_id"),)).fetchall()
     conn.close()
-    return render_template("meus_pets.html", pets=pets)
+    vaccine_events = build_vaccine_events(vaccines)
+    pet_vaccines_map = {}
+    for vaccine in vaccines:
+        pet_vaccines_map.setdefault(vaccine["pet_id"], []).append(vaccine)
+    return render_template(
+        "meus_pets.html",
+        pets=pets,
+        pet_vaccines_map=pet_vaccines_map,
+        vaccine_events=vaccine_events,
+        today=date.today().isoformat(),
+    )
 
 
 @app.route("/donos")
@@ -285,7 +473,12 @@ def excluir_dono(id):
 def listar_pets():
     conn = get_db_connection()
     pets = conn.execute("""
-        SELECT pets.*, donos.nome AS dono_nome, users.username AS cliente_username
+        SELECT pets.*, donos.nome AS dono_nome, users.username AS cliente_username,
+               (
+                   SELECT COUNT(*)
+                   FROM pet_vaccines
+                   WHERE pet_vaccines.pet_id = pets.id
+               ) AS total_vacinas
         FROM pets
         LEFT JOIN donos ON pets.dono_id = donos.id
         LEFT JOIN users ON pets.user_id = users.id
@@ -305,13 +498,22 @@ def cadastro_pet():
         nome = request.form["nome"]
         especie = request.form["especie"]
         idade = request.form["idade"]
+        idade_meses = request.form.get("idade_meses") or None
+        peso = request.form.get("peso") or None
+        porte = request.form.get("porte") or None
         dono_id = request.form["dono_id"]
         user_id = request.form["user_id"]
+        vaccines = collect_vaccines_from_form(request.form)
+        vacina_data, vacina_observacao, vacina_recorrente_anual = build_primary_vaccine_fields(vaccines)
 
-        conn.execute("""
-            INSERT INTO pets (nome, especie, idade, dono_id, user_id)
-            VALUES (?, ?, ?, ?, ?)
-        """, (nome, especie, idade, dono_id, user_id))
+        cursor = conn.execute("""
+            INSERT INTO pets (
+                nome, especie, idade, idade_meses, peso, porte, dono_id, user_id,
+                vacina_data, vacina_observacao, vacina_recorrente_anual
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (nome, especie, idade, idade_meses, peso, porte, dono_id, user_id, vacina_data, vacina_observacao, vacina_recorrente_anual))
+        save_pet_vaccines(conn, cursor.lastrowid, vaccines)
 
         conn.commit()
         conn.close()
@@ -332,8 +534,14 @@ def crud_pet(id):
         LEFT JOIN users ON pets.user_id = users.id
         WHERE pets.id = ?
     """, (id,)).fetchone()
+    vaccines = conn.execute("""
+        SELECT *
+        FROM pet_vaccines
+        WHERE pet_id = ?
+        ORDER BY vacina_data, id
+    """, (id,)).fetchall()
     conn.close()
-    return render_template("crud_pet.html", pet=pet)
+    return render_template("crud_pet.html", pet=pet, vaccines=vaccines)
 
 
 @app.route("/editar_pet/<int:id>", methods=["GET", "POST"])
@@ -345,25 +553,38 @@ def editar_pet(id):
         nome = request.form["nome"]
         especie = request.form["especie"]
         idade = request.form["idade"]
+        idade_meses = request.form.get("idade_meses") or None
+        peso = request.form.get("peso") or None
+        porte = request.form.get("porte") or None
         dono_id = request.form["dono_id"]
         user_id = request.form["user_id"]
+        vaccines = collect_vaccines_from_form(request.form)
+        vacina_data, vacina_observacao, vacina_recorrente_anual = build_primary_vaccine_fields(vaccines)
 
         conn.execute("""
             UPDATE pets
-            SET nome = ?, especie = ?, idade = ?, dono_id = ?, user_id = ?
+            SET nome = ?, especie = ?, idade = ?, idade_meses = ?, peso = ?, porte = ?,
+                dono_id = ?, user_id = ?, vacina_data = ?, vacina_observacao = ?, vacina_recorrente_anual = ?
             WHERE id = ?
-        """, (nome, especie, idade, dono_id, user_id, id))
+        """, (nome, especie, idade, idade_meses, peso, porte, dono_id, user_id, vacina_data, vacina_observacao, vacina_recorrente_anual, id))
+        save_pet_vaccines(conn, id, vaccines)
 
         conn.commit()
         conn.close()
         return redirect(url_for("listar_pets"))
 
     pet = conn.execute("SELECT * FROM pets WHERE id = ?", (id,)).fetchone()
+    vaccines = conn.execute("""
+        SELECT *
+        FROM pet_vaccines
+        WHERE pet_id = ?
+        ORDER BY vacina_data, id
+    """, (id,)).fetchall()
     donos = conn.execute("SELECT * FROM donos").fetchall()
     users = conn.execute("SELECT id, nome, username FROM users ORDER BY username").fetchall()
     conn.close()
 
-    return render_template("editar_pet.html", pet=pet, donos=donos, users=users)
+    return render_template("editar_pet.html", pet=pet, vaccines=vaccines, donos=donos, users=users)
 
 
 @app.route("/excluir_pet/<int:id>", methods=["POST"])
