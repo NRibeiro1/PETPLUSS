@@ -1,0 +1,4 @@
+Um pet shop local, identificou dificuldades no controle e organização das informações de seus clientes e animais atendidos. O registro de dados era feito manualmente, o que frequentemente resultava em perda de informações, retrabalho e dificuldade para localizar cadastros.
+Para solucionar esse problema, será desenvolvido o PetPlus, um sistema simples e funcional que permite cadastrar e gerenciar pets e seus respectivos donos de forma digital, oferecendo uma interface estruturada e facilitando o acesso às informações.
+O projeto será desenvolvido utilizando a linguagem Python, aplicando os conceitos de Programação Orientada a Objetos (POO), como herança, encapsulamento e polimorfismo, para garantir um código organizado, reutilizável e de fácil manutenção.
+Em resumo, o PetPlus transformará o processo do cliente ao substituir o controle manual por um sistema automatizado, tornando a gestão de cadastros mais ágil, precisa e eficiente.
